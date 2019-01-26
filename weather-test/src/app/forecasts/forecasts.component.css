@@ -1,6 +1,6 @@
 .forecast {
   margin: 0 auto;
-  width: 50%;
+  width: 80%;
 }
 
 .forecast-item {
@@ -15,15 +15,6 @@
   margin-bottom: 0px;
 }
 
-.row > div {
-  padding: 0.325em;
-}
-
-#address {
-  padding: 5px;
-  width: 20em;
-}
-
-#search {
-  padding: 3px;
+.forecast-item:first-child {
+  margin-top: 5px;
 }

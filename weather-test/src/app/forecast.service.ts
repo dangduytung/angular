@@ -26,8 +26,8 @@ export class ForecastService {
         APPID: '421612f4c4fd7e87a2399806a781659c'
       }
     }).pipe(
-      tap(data => console.log(`getForecasts ${JSON.stringify(data)}`)),
-      catchError(error => of(null))
+      tap(data => data),
+      catchError(error => of(new ForecastModel()))
     );
   }
 }

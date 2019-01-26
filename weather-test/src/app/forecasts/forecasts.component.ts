@@ -25,4 +25,10 @@ export class ForecastsComponent implements OnInit {
     }
     this.forecastService.getForecastDaily(address).subscribe(data => this.forecastDaily = data.list);
   }
+
+  onKeydown(event) {
+    if (event.key === 'Enter') {
+      this.search(event.target.value);
+    }
+  }
 }
