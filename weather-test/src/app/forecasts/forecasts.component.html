@@ -15,21 +15,21 @@
     <div class="forecast">
       <div class="forecast-item" *ngFor="let forecast of forecastDaily">
         <div class="row">
-          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-6">
+          <div class="col-sm-3 col-6">
             <label>{{forecast.dt * 1000 | date : "EEEE, dd/MM/yyyy"}}</label>
           </div>
-          <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-6">
+          <div class="col-sm-2 col-6">
             <i class="fa fa-thermometer-half"></i>
             {{forecast.temp.day}} &#x2103;
           </div>
-          <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-4">
+          <div class="col-sm-2 col-4">
             ({{forecast.temp.min}} &#x2103; - {{forecast.temp.max}} &#x2103;)
           </div>
-          <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-4">
+          <div class="col-sm-2 col-4">
             <img src="assets/img/humidity.png" style="width: 16px">
             {{forecast.humidity}} %
           </div>
-          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-4">
+          <div class="col-sm-3 col-4">
             <ng2-wi [name]="'sunny'" [mode]="'day'">
             </ng2-wi>&nbsp;{{forecast.weather[0].description}}
           </div>
