@@ -24,6 +24,7 @@ export class ForecastsComponent implements OnInit {
   search(address: string): void {
     if (!address) {
       console.warn('Address must be not empty');
+      return;
     }
     console.log('Search : ' + address)
     this.forecastService.getForecastDaily(address).subscribe(data => this.forecastModel = data);
