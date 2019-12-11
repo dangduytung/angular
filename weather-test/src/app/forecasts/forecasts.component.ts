@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ForecastDaily} from '../../models/forecastDaily';
 import {ForecastService} from '../forecast.service';
+import { ForecastModel } from 'src/models/forecastModel';
 
 @Component({
   selector: 'app-forecasts',
@@ -12,7 +13,8 @@ export class ForecastsComponent implements OnInit {
   constructor(public forecastService: ForecastService) {
   }
 
-  forecastDaily: ForecastDaily;
+  // forecastDaily: ForecastDaily;
+  forecastModel: ForecastModel;
 
   ngOnInit() {
     // this.forecastService.getForecasts().subscribe(data => this.forecastDaily = data.list);
@@ -23,7 +25,8 @@ export class ForecastsComponent implements OnInit {
     if (!address) {
       console.warn('Address must be not empty');
     }
-    this.forecastService.getForecastDaily(address).subscribe(data => this.forecastDaily = data.list);
+    console.log('Search : ' + address)
+    this.forecastService.getForecastDaily(address).subscribe(data => this.forecastModel = data);
   }
 
   onKeydown(event) {
