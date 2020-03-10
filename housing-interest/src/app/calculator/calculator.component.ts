@@ -46,7 +46,7 @@ export class CalculatorComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.calculate();
+    this.calculateTotal();
   }
 
   selectOption(id: number) {
@@ -55,28 +55,47 @@ export class CalculatorComponent implements OnInit {
 
     // getted from binding
     // console.log(this.selected);
-    this.calculate();
+
+    this.calculateTotal();
+  }
+
+  calculateMoneyPrepaid() {
+    this.moneyPrepaid = (this.moneyHouse * this.interestItems[this.selected - 1].value) / 100;
+    this.moneyPrepaid = Math.round(this.moneyPrepaid);
+  }
+
+  calculateMoney() {
+    this.money = this.moneyHouse - this.moneyPrepaid;
+    this.moneyOriginalMonth = this.money / (this.period * 12);
+    this.moneyOriginalMonth = Math.round(this.moneyOriginalMonth);
+  }
+
+  calculateAll(isChangePrepaid: boolean) {
+    this.reset();
+
+    if (isChangePrepaid) {
+      this.calculateMoneyPrepaid();
+    }
+
+    this.calculateMoney();
+
+    this.debtDescending();
   }
 
   calculate() {
-    this.reset();
+    this.calculateAll(false);
+  }
 
-    this.moneyPrepaid =
-      (this.moneyHouse * this.interestItems[this.selected - 1].value) / 100;
-    this.moneyPrepaid = Math.round(this.moneyPrepaid);
-
-    this.money = this.moneyHouse - this.moneyPrepaid;
-
-    this.moneyOriginalMonth = this.money / (this.period * 12);
-    this.moneyOriginalMonth = Math.round(this.moneyOriginalMonth);
-
-    this.debtDescending();
+  calculateTotal() {
+    this.calculateAll(true);
   }
 
   @HostListener('input', ['$event']) onEvent(event) {
     console.log('onEvent ' + event.target.id);
     switch (event.target.id) {
       case 'price':
+        this.calculateTotal();
+        break;
       case 'period':
       case 'interest':
         this.calculate();
