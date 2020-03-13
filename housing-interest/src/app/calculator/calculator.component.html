@@ -17,6 +17,37 @@
       </div>
 
       <div class="form-group row">
+        <label for="prepaid" class="col-sm-4 col-form-label">Trả trước (%)</label>
+        <div class="col-sm-4">
+          <select class="form-control" id="prepaid" (change)="selectOptionPrepaid($event.target.value)" [(ngModel)]="selected">
+            <option [value]="interestItem.id" *ngFor="let interestItem of interestItems">{{interestItem.name}}</option>
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <label style="position: relative; top: 10px">{{moneyPrepaid | number}} (VNĐ)</label>
+        </div>
+      </div>
+
+      <div class="form-group row" style="border: 1px solid #000000;">
+      </div>
+
+      <div class="form-group row">
+        <label for="bank" class="col-sm-4 col-form-label"><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTi2gbcG60Nvsg0IcTYt_38EhZBr5yi5sTk3dL1WbfvaVzJ-J1iOEZ3y-Me9Jvbc9jWt7SCd81H7hBG/pubhtml?gid=0&single=true" target="_blank">Ngân hàng</a></label>
+        <div class="col-sm-4">
+          <select class="form-control" id="bank" (change)="selectOptionBank($event.target.value)">
+            <option></option>
+            <option [value]="bank.a" *ngFor="let bank of bankDataSheet">{{bank.b}}</option>
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <select class="form-control" id="bank-month-preference" [(ngModel)]="preferentialMonth" (change)="selectOptionBankPreference()">
+            <option></option>
+            <option [ngValue]="obj" *ngFor="let obj of preferentialMonths">{{obj.month + '&nbsp;tháng - ' + obj.interest + '%'}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <label for="period" class="col-sm-4 col-form-label">Kỳ hạn (năm)</label>
         <div class="col-sm-4">
           <input type="number" class="form-control" id="period" [(ngModel)]="period">
@@ -24,18 +55,6 @@
         <div class="col-sm-4" style="margin-top: -10px;">
           <ng5-slider id="period-slider" [(value)]="period" [options]="periodOptions" (valueChange)="calculate()">
           </ng5-slider>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="prepaid" class="col-sm-4 col-form-label">Trả trước (%)</label>
-        <div class="col-sm-4">
-          <select class="form-control" id="prepaid" (change)="selectOption($event.target.value)" [(ngModel)]="selected">
-            <option [value]="interestItem.id" *ngFor="let interestItem of interestItems">{{interestItem.name}}</option>
-          </select>
-        </div>
-        <div class="col-sm-4">
-          <label style="position: relative; top: 10px">{{moneyPrepaid | number}} (VNĐ)</label>
         </div>
       </div>
 
@@ -61,9 +80,16 @@
       </div>
 
       <div class="row">
-        <label for="money-month" class="col-sm-4 col-form-label">Tổng tiền lãi</label>
+        <label for="money-month" class="col-sm-4 col-form-label">Tổng lãi chưa ưu đãi</label>
         <div class="col-sm-4" style="text-align: right;">
-          <label style="position: relative; top: 7px">{{moneyInterestTotal | number}} (VNĐ)</label>
+          <label style="position: relative; top: 7px">{{(moneyInterestTotal > 0 ? moneyInterestTotal : '') | number}} {{moneyInterestTotal > 0 ? '(VNĐ)' : '' }}</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="money-month" class="col-sm-4 col-form-label">Tổng lãi có ưu đãi</label>
+        <div class="col-sm-4" style="text-align: right;">
+          <label style="position: relative; top: 7px">{{(moneyInterestPreferenceTotal > 0 ? moneyInterestPreferenceTotal : '') | number}} {{moneyInterestPreferenceTotal > 0 ? '(VNĐ)' : '' }}</label>
         </div>
       </div>
 
@@ -90,7 +116,7 @@
               <th scope="col" class="text-center">Kỳ</th>
               <th scope="col" class="text-center">Số gốc còn lại</th>
               <th scope="col" class="text-center">Gốc</th>
-              <th scope="col" class="text-center">Lãi</th>
+              <th scope="col" class="text-center">Lãi / Ưu đãi</th>
               <th scope="col" class="text-center">Gốc + Lãi</th>
             </tr>
           </thead>
@@ -98,9 +124,11 @@
             <tr *ngFor="let debt of debts">
               <th scope="row" class="text-center">{{debt.id}}</th>
               <td class="text-center">{{debt.moneyRemaining | number}}</td>
-              <td class="text-center">{{debt.moneyOriginalMonth | number}}</td>
-              <td class="text-center">{{debt.moneyInterestMonth | number}}</td>
-              <td class="text-center">{{debt.moneyOriginalMonth + debt.moneyInterestMonth | number}}</td>
+              <td class="text-center">{{debt.moneyOriginalMonth == 0 ? '' : debt.moneyOriginalMonth | number}}</td>
+              <td class="text-center">{{debt.moneyInterestMonth == 0 ? '' : debt.moneyInterestMonth | number}}<br>
+                {{debt.moneyInterestPreference == 0 ? '' : debt.moneyInterestPreference | number}}</td>
+              <td class="text-center">{{(debt.moneyOriginalMonth + debt.moneyInterestMonth) == 0 ? '' : (debt.moneyOriginalMonth + debt.moneyInterestMonth) | number}}<br>
+                {{debt.moneyInterestPreference == 0 ? '' : debt.moneyOriginalMonth + debt.moneyInterestPreference | number}}</td>
             </tr>
           </tbody>
           <tfoot>

@@ -6,6 +6,7 @@ import { Ng5SliderModule } from 'ng5-slider';
 import { AppComponent } from './app.component';
 import { CalculatorComponent } from './calculator/calculator.component';
 import { from } from 'rxjs';
+import { HttpModule } from '@angular/http';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,9 @@ import { from } from 'rxjs';
   imports: [
     BrowserModule,
     FormsModule,
-    Ng5SliderModule
+    Ng5SliderModule,
+    // tslint:disable-next-line: deprecation
+    HttpModule
   ],
   providers: [],
   bootstrap: [AppComponent]

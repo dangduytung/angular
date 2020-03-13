@@ -30,4 +30,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 npm install --save bootstrap<br>
 npm install --save jquery<br>
 npm install --save ng5-slider<br>
+npm install @angular/http@latest<br>
 
+Read data preferential interest rates of banks from Google Sheet. Update 03/2020

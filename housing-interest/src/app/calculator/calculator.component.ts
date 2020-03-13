@@ -1,14 +1,18 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { Options } from 'ng5-slider';
 import { Debt } from '../model/Debt.model';
+import { DebtService } from '../service/debt.service';
+import { Subscription } from 'rxjs';
+import { GoogleDriveProvider } from '../google/GoogleDriveProvider';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-calculator',
   templateUrl: './calculator.component.html',
-  styleUrls: ['./calculator.component.css']
+  styleUrls: ['./calculator.component.css'],
+  providers: [GoogleDriveProvider]
 })
-export class CalculatorComponent implements OnInit {
-
+export class CalculatorComponent implements OnInit, OnDestroy {
   period = 20; // chu ky lai
   periodOptions: Options = {
     floor: 3,
@@ -39,17 +43,29 @@ export class CalculatorComponent implements OnInit {
   moneyPrepaid: number; // tien tra truoc
   money: number; // tien nha con thieu
   moneyOriginalMonth: number; // tien goc hang thang
-  moneyInterestTotal = 0; // tong tien lai
+  moneyInterestTotal = 0; // tong tien lai chua uu dai
+  moneyInterestPreferenceTotal = 0; // tong tien lai co uu dai
 
-  debts: Debt[] = [];
+  debts: Debt[] = []; // Du no giam dan
+  subscription: Subscription;
 
-  constructor() {}
+  bankDataSheet: any[] = [];
+  bankPreference: any;
+  subGoogleDrive: Subscription;
+  preferentialMonths: any[] = [];
+  preferentialMonth: any;
+
+  constructor(
+    private debtService: DebtService,
+    private googleDrive: GoogleDriveProvider
+  ) {}
 
   ngOnInit(): void {
+    this.getDataGoogleSheet();
     this.calculateTotal();
   }
 
-  selectOption(id: number) {
+  selectOptionPrepaid(id: number) {
     // getted from event
     // console.log(id);
 
@@ -59,8 +75,25 @@ export class CalculatorComponent implements OnInit {
     this.calculateTotal();
   }
 
-  calculateMoneyPrepaid() {
-    this.moneyPrepaid = (this.moneyHouse * this.interestItems[this.selected - 1].value) / 100;
+  selectOptionBank(id: number) {
+    // console.log(id);
+    this.preferentialMonth = undefined;
+    this.bankPreference = this.bankDataSheet.find(x => x.a === id);
+    console.log(this.bankPreference);
+    this.preferentialMonths = this.debtService.getPreferentialMonths(
+      this.bankPreference
+    );
+    this.calculate();
+  }
+
+  selectOptionBankPreference() {
+    // console.log('preferentialMonth : ' + JSON.stringify(this.preferentialMonth));
+    this.calculate();
+  }
+
+  getMoneyPrepaid() {
+    this.moneyPrepaid =
+      (this.moneyHouse * this.interestItems[this.selected - 1].value) / 100;
     this.moneyPrepaid = Math.round(this.moneyPrepaid);
   }
 
@@ -74,12 +107,14 @@ export class CalculatorComponent implements OnInit {
     this.reset();
 
     if (isChangePrepaid) {
-      this.calculateMoneyPrepaid();
+      this.getMoneyPrepaid();
     }
 
     this.calculateMoney();
 
     this.debtDescending();
+
+    this.sumMoneyInterestTotal();
   }
 
   calculate() {
@@ -108,34 +143,60 @@ export class CalculatorComponent implements OnInit {
   reset() {
     this.moneyInterestTotal = 0;
     this.debts = [];
+    this.moneyInterestTotal = 0;
+    this.moneyInterestPreferenceTotal = 0;
   }
 
   debtDescending() {
-    const periodMonths: number = this.period * 12;
-
-    // tslint:disable-next-line: prefer-const
-    let moneyRemaining = this.money;
-
-    // Chua tra lai
-    this.debts.push(new Debt(0, moneyRemaining, undefined, undefined));
-
-    for (let i = 1; i < periodMonths + 1; i++) {
-      let moneyInterestMonth = (moneyRemaining * this.interest) / (100 * 12);
-      moneyInterestMonth = Math.round(moneyInterestMonth);
-      // tslint:disable-next-line: prefer-const
-
-      moneyRemaining -= this.moneyOriginalMonth;
-      moneyRemaining = moneyRemaining > 0 ? moneyRemaining : 0;
-
-      this.moneyInterestTotal += moneyInterestMonth;
-
-      const debt = new Debt(
-        i,
-        moneyRemaining,
+    this.subscription = this.debtService
+      .getDebts(
+        this.money,
         this.moneyOriginalMonth,
-        moneyInterestMonth
-      );
-      this.debts.push(debt);
+        this.period * 12,
+        this.interest,
+        this.preferentialMonth
+      )
+      .subscribe((debtsData: Debt[]) => {
+        this.debts = debtsData;
+      });
+  }
+
+  sumMoneyInterestTotal() {
+    if (this.preferentialMonth === undefined || this.preferentialMonth === '') {
+      this.debts.map(debt => {
+        this.moneyInterestTotal += debt.moneyInterestMonth;
+      });
+    } else {
+      this.debts.map(debt => {
+        this.moneyInterestTotal += debt.moneyInterestMonth;
+        if (debt.id <= this.preferentialMonth.month) {
+          this.moneyInterestPreferenceTotal += debt.moneyInterestPreference;
+        } else {
+          this.moneyInterestPreferenceTotal += debt.moneyInterestMonth;
+        }
+      });
     }
+  }
+
+  getDataGoogleSheet() {
+    this.subGoogleDrive = this.googleDrive
+      .getSheetData()
+      .pipe(finalize(() => this.preferentialBanks()))
+      .subscribe((bankDataSheet: any[]) => {
+        this.bankDataSheet = bankDataSheet;
+      });
+  }
+
+  preferentialBanks() {
+    this.bankDataSheet.splice(0, 2);
+    console.log('list banks have preferences : ' + this.bankDataSheet.length);
+    this.bankDataSheet.map(data => {
+      // console.log(data);
+    });
+  }
+
+  ngOnDestroy(): void {
+    // unsubscribe to ensure no memory leaks
+    this.subscription.unsubscribe();
   }
 }

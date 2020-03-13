@@ -1,2 +1,3 @@
 input[type=number] { text-align:right }
-select { direction: rtl; }
+select#prepaid { direction: rtl; }
+select#bank { text-align: center; text-align-last: center;}
