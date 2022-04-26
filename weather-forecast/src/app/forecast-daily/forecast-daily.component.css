@@ -1,0 +1,20 @@
+.forecast {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.forecast-item {
+  border: 1px dotted lightgrey;
+  font-size: 1em;
+  font-family: sans-serif, Tahoma;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.forecast-item:last-child {
+  margin-bottom: 0px;
+}
+
+.forecast-item:first-child {
+  margin-top: 5px;
+}
