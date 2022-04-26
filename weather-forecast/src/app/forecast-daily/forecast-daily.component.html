@@ -1,0 +1,47 @@
+<div class="container container-fluid">
+  <div class="row">
+    <div class="col-md-4 offset-md-4">
+      <div class="form-group">
+        <input id="address" class="form-control" #address placeholder="Input city" (keydown.enter)="search(address.value)">
+      </div>
+    </div>
+  </div>
+  <div class="row p-1">
+    <div class="col-md-4 offset-md-4">
+      <button id="search" (click)="search(address.value)" class="btn btn-success">Search</button>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="forecastDaily">
+    <div class="forecast">
+      <div class="row" *ngIf="forecastDaily.city">
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-6">
+          <label><strong>{{forecastDaily.city.name}} , {{forecastDaily.city.country}}</strong></label>
+        </div>
+      </div>
+      <div *ngIf="forecastDaily.list">
+        <div class="forecast-item" *ngFor="let forecast of forecastDaily.list">
+          <div class="row">
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-6">
+              <label>{{forecast.dt * 1000 | date : "EEEE, dd/MM/yyyy"}}</label>
+            </div>
+            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-6">
+              <i class="fa fa-thermometer-half" aria-hidden="true"></i>
+              {{forecast.temp.day}} &#x2103;
+            </div>
+            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-4">
+              ({{forecast.temp.min}} &#x2103; - {{forecast.temp.max}} &#x2103;)
+            </div>
+            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-4">
+              <img src="assets/img/humidity.png" alt="" style="width: 16px">
+              {{forecast.humidity}} %
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-4">
+              <span> {{ forecast.weather && forecast.weather.length ? forecast.weather[0].description : '' }} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

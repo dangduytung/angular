@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "angular-calculator-1": {
+      "hosting": {
+        "calculator": [
+          "angular-calculator-1"
+        ]
+      }
+    }
+  }
+}
